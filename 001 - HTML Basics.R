@@ -1,7 +1,8 @@
 library(tidyverse)
 library(rvest)
 
-HTML <-   '<!DOCTYPE html>
+HTML <-   
+'<!DOCTYPE html>
    <html>
    
      <head>
