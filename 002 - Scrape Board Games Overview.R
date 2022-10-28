@@ -73,11 +73,13 @@ df <- map_dfr(rows, function(row){
   
   tibble(rank, title, year, description, geek_rating, avg_rating, num_voters, thumbnail, link)
   
-}
+})
   
 ## Create a function and loop over pages
 
-parse_page <- function(url){
+base_url <- "https://boardgamegeek.com/browse/boardgame/page/{page}"
+
+parse_overview_page <- function(url){
   html_data <- read_html(url)
   
   rows <- html_data %>% html_nodes("#row_")
@@ -125,24 +127,24 @@ parse_page <- function(url){
       html_attr("href")
     
     tibble(rank, title, year, description, geek_rating, avg_rating, num_voters, thumbnail, link)
+    
   })
   
   df
 }
 
-base_url <- "https://boardgamegeek.com/browse/boardgame/page/{pages}"
 pages <- 1:20
-urls <- glue::glue(base_url)
 
-pb <- progress::progress_bar$new(total = length(urls))
+pb <- progress::progress_bar$new(total = max(pages))
 
-all_boardgame_data <- map_dfr(urls, function(url){
+all_boardgames_overview <- map_dfr(pages, function(page){
   pb$tick()
-  parse_page(url)
+  
+  url <- glue::glue(base_url)
+  
+  parse_overview_page(url)
 })
 
-
-
-
-
-
+all_boardgames_overview %>%
+  distinct() %>%
+  write_rds("boardgames_overview.RDS")
